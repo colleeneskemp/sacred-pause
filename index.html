@@ -2,1068 +2,743 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport name="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sacred Pause</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Nunito+Sans:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        :root {
+            --sand: #F5EDE3;
+            --sand-light: #FAF6F1;
+            --sand-dark: #E8DDD0;
+            --ocean-deep: #2C4A52;
+            --ocean-mid: #4A7C7E;
+            --ocean-light: #7EB5B0;
+            --ocean-pale: #B8D8D4;
+            --sunset: #D4956A;
+            --sunset-light: #E8C4A0;
+            --rose: #C28B7A;
+            --rose-light: #E0BFB4;
+            --cloud: rgba(255,255,255,0.85);
+            --text: #2C3E3E;
+            --text-light: #6B7F7F;
+            --gold: #C9A96E;
         }
 
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'Nunito Sans', sans-serif;
+            background: var(--sand);
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 20px;
+            padding: 16px;
+            color: var(--text);
         }
 
-        .app-container {
-            background: white;
-            border-radius: 24px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        .app {
+            background: var(--sand-light);
+            border-radius: 32px;
             max-width: 420px;
             width: 100%;
-            min-height: 600px;
+            min-height: 640px;
             overflow: hidden;
             position: relative;
+            box-shadow:
+                0 4px 24px rgba(44,74,82,0.08),
+                0 20px 60px rgba(44,74,82,0.12);
         }
 
         .screen {
             display: none;
-            padding: 40px 30px;
-            min-height: 600px;
-            animation: fadeIn 0.5s ease-in-out;
+            min-height: 640px;
+            animation: emerge 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+            position: relative;
         }
+        .screen.active { display: flex; flex-direction: column; }
 
-        .screen.active {
-            display: block;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
+        @keyframes emerge {
+            from { opacity: 0; transform: translateY(16px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
-        h1 {
-            font-size: 28px;
-            color: #2d3748;
-            margin-bottom: 12px;
-            font-weight: 600;
-        }
+        /* Typography */
+        .serif { font-family: 'Cormorant Garamond', serif; }
+        h1 { font-family: 'Cormorant Garamond', serif; font-size: 32px; font-weight: 400; color: var(--ocean-deep); letter-spacing: -0.02em; }
+        h2 { font-family: 'Cormorant Garamond', serif; font-size: 26px; font-weight: 400; color: var(--ocean-deep); letter-spacing: -0.01em; }
+        .body-text { font-size: 15px; color: var(--text-light); line-height: 1.7; font-weight: 300; }
 
-        h2 {
-            font-size: 24px;
-            color: #2d3748;
-            margin-bottom: 16px;
-            font-weight: 600;
-        }
-
-        .subtitle {
-            font-size: 16px;
-            color: #718096;
-            margin-bottom: 32px;
-            line-height: 1.6;
-        }
-
-        .btn-primary {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
+        /* Buttons */
+        .btn {
             border: none;
             padding: 16px 32px;
-            border-radius: 12px;
-            font-size: 18px;
-            font-weight: 600;
-            cursor: pointer;
-            width: 100%;
-            transition: transform 0.2s, box-shadow 0.2s;
-            margin-top: 16px;
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
-        }
-
-        .btn-primary:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        .btn-secondary {
-            background: white;
-            color: #667eea;
-            border: 2px solid #667eea;
-            padding: 14px 28px;
-            border-radius: 12px;
+            border-radius: 16px;
+            font-family: 'Nunito Sans', sans-serif;
             font-size: 16px;
             font-weight: 600;
             cursor: pointer;
             width: 100%;
-            transition: all 0.2s;
-            margin-top: 12px;
+            transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+            letter-spacing: 0.02em;
         }
-
-        .btn-secondary:hover {
-            background: #f7fafc;
+        .btn-main {
+            background: linear-gradient(135deg, var(--ocean-deep) 0%, var(--ocean-mid) 100%);
+            color: white;
+            box-shadow: 0 4px 20px rgba(44,74,82,0.25);
         }
+        .btn-main:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(44,74,82,0.3); }
+        .btn-soft {
+            background: var(--cloud);
+            color: var(--ocean-deep);
+            border: 1.5px solid var(--ocean-pale);
+            margin-top: 10px;
+        }
+        .btn-soft:hover { background: white; border-color: var(--ocean-mid); }
 
-        .sacred-pause-btn {
-            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        .back-link {
+            background: none; border: none; color: var(--ocean-mid);
+            font-size: 14px; cursor: pointer; padding: 4px 0;
+            font-family: 'Nunito Sans', sans-serif; font-weight: 400;
+            letter-spacing: 0.02em;
+        }
+        .back-link:hover { color: var(--ocean-deep); }
+
+        /* Sacred Pause Button */
+        .pause-btn {
+            background: linear-gradient(145deg, var(--sunset) 0%, var(--rose) 100%);
             color: white;
             border: none;
-            padding: 60px 40px;
-            border-radius: 24px;
-            font-size: 32px;
-            font-weight: 700;
+            padding: 52px 40px;
+            border-radius: 28px;
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 36px;
+            font-weight: 500;
             cursor: pointer;
             width: 100%;
-            transition: transform 0.3s, box-shadow 0.3s;
-            margin: 40px 0;
+            transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+            letter-spacing: 0.08em;
             text-transform: uppercase;
-            letter-spacing: 1px;
-            box-shadow: 0 10px 40px rgba(245, 87, 108, 0.4);
-        }
-
-        .sacred-pause-btn:hover {
-            transform: scale(1.05);
-            box-shadow: 0 15px 50px rgba(245, 87, 108, 0.5);
-        }
-
-        .practice-card {
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-            border-radius: 16px;
-            padding: 24px;
-            margin-bottom: 16px;
-            cursor: pointer;
-            transition: all 0.2s;
-            border: 3px solid transparent;
-        }
-
-        .practice-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
-            border-color: #667eea;
-        }
-
-        .practice-card h3 {
-            font-size: 20px;
-            color: #2d3748;
-            margin-bottom: 8px;
-        }
-
-        .practice-card p {
-            font-size: 14px;
-            color: #4a5568;
-            line-height: 1.5;
-        }
-
-        .intention-input {
-            width: 100%;
-            padding: 16px;
-            border: 2px solid #e2e8f0;
-            border-radius: 12px;
-            font-size: 16px;
-            margin-bottom: 16px;
-            transition: border-color 0.2s;
-            font-family: inherit;
-        }
-
-        .intention-input:focus {
-            outline: none;
-            border-color: #667eea;
-        }
-
-        .preset-intentions {
-            margin-bottom: 24px;
-        }
-
-        .preset-btn {
-            background: #edf2f7;
-            color: #2d3748;
-            border: 2px solid #e2e8f0;
-            padding: 12px 20px;
-            border-radius: 20px;
-            font-size: 14px;
-            cursor: pointer;
-            margin: 6px 6px 6px 0;
-            display: inline-block;
-            transition: all 0.2s;
-        }
-
-        .preset-btn:hover {
-            background: #667eea;
-            color: white;
-            border-color: #667eea;
-        }
-
-        /* SHIP WHEEL ANIMATION */
-        .ship-wheel-container {
-            position: relative;
-            width: 200px;
-            height: 200px;
-            margin: 0 auto 32px;
-        }
-
-        .ship-wheel {
-            width: 200px;
-            height: 200px;
-            margin: 0 auto;
-            position: relative;
-            animation: gentleRotate 20s linear infinite;
-        }
-
-        @keyframes gentleRotate {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
-        }
-
-        .wheel-center {
-            width: 40px;
-            height: 40px;
-            background: #8b4513;
-            border-radius: 50%;
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            box-shadow: inset 0 2px 8px rgba(0,0,0,0.3);
-        }
-
-        .wheel-spoke {
-            width: 4px;
-            height: 100px;
-            background: #a0522d;
-            position: absolute;
-            top: 0;
-            left: 50%;
-            transform-origin: bottom center;
-            border-radius: 2px;
-        }
-
-        .wheel-rim {
-            width: 200px;
-            height: 200px;
-            border: 8px solid #8b4513;
-            border-radius: 50%;
-            position: absolute;
-            top: 0;
-            left: 0;
-        }
-
-        .ocean-horizon {
-            width: 100%;
-            height: 3px;
-            background: linear-gradient(90deg, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0.8) 50%, rgba(255,255,255,0.4) 100%);
-            position: absolute;
-            bottom: 30%;
-            left: 0;
-            animation: waveShimmer 3s ease-in-out infinite;
-        }
-
-        @keyframes waveShimmer {
-            0%, 100% { opacity: 0.6; }
-            50% { opacity: 1; }
-        }
-
-        .horizon-visual {
-            background: linear-gradient(180deg, #87ceeb 0%, #4a90e2 40%, #ffa07a 70%, #ff8c69 100%);
-            border-radius: 16px;
-            padding: 40px 20px;
-            text-align: center;
-            margin-bottom: 24px;
-            position: relative;
-            overflow: hidden;
-            min-height: 280px;
-        }
-
-        /* GRATITUDE BALLOON ANIMATION */
-        .sky-container {
-            background: linear-gradient(180deg, #1e3a8a 0%, #3b82f6 30%, #87ceeb 60%, #e0f2fe 100%);
-            border-radius: 16px;
-            padding: 40px 20px;
-            min-height: 400px;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .cloud {
-            position: absolute;
-            background: white;
-            border-radius: 100px;
-            opacity: 0.7;
-            animation: floatCloud 30s linear infinite;
-        }
-
-        .cloud:before,
-        .cloud:after {
-            content: '';
-            position: absolute;
-            background: white;
-            border-radius: 100px;
-        }
-
-        .cloud-1 {
-            width: 80px;
-            height: 30px;
-            top: 60%;
-            left: -80px;
-        }
-
-        .cloud-1:before {
-            width: 50px;
-            height: 40px;
-            top: -20px;
-            left: 10px;
-        }
-
-        .cloud-1:after {
-            width: 40px;
-            height: 35px;
-            top: -15px;
-            right: 10px;
-        }
-
-        .cloud-2 {
-            width: 100px;
-            height: 35px;
-            top: 70%;
-            left: -100px;
-            animation-delay: 10s;
-        }
-
-        .cloud-2:before {
-            width: 60px;
-            height: 45px;
-            top: -22px;
-            left: 15px;
-        }
-
-        .cloud-2:after {
-            width: 50px;
-            height: 40px;
-            top: -18px;
-            right: 15px;
-        }
-
-        .cloud-3 {
-            width: 90px;
-            height: 32px;
-            top: 65%;
-            left: -90px;
-            animation-delay: 20s;
-        }
-
-        .cloud-3:before {
-            width: 55px;
-            height: 42px;
-            top: -21px;
-            left: 12px;
-        }
-
-        .cloud-3:after {
-            width: 45px;
-            height: 37px;
-            top: -16px;
-            right: 12px;
-        }
-
-        @keyframes floatCloud {
-            from { transform: translateX(0); }
-            to { transform: translateX(calc(100vw + 100px)); }
-        }
-
-        .balloon {
-            width: 80px;
-            height: 100px;
-            background: linear-gradient(135deg, #ff6b9d 0%, #c44569 100%);
-            border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
-            position: absolute;
-            left: 50%;
-            bottom: 10%;
-            transform: translateX(-50%);
-            transition: bottom 3s cubic-bezier(0.34, 1.56, 0.64, 1), transform 3s ease-in-out;
-            animation: balloonSway 4s ease-in-out infinite;
-        }
-
-        .balloon.rising {
-            bottom: 80%;
-        }
-
-        @keyframes balloonSway {
-            0%, 100% { transform: translateX(-50%) rotate(-3deg); }
-            50% { transform: translateX(-50%) rotate(3deg); }
-        }
-
-        .balloon:before {
-            content: '';
-            position: absolute;
-            width: 8px;
-            height: 8px;
-            background: #8b4569;
-            bottom: -5px;
-            left: 50%;
-            transform: translateX(-50%);
-            border-radius: 50%;
-        }
-
-        .balloon:after {
-            content: '';
-            position: absolute;
-            width: 2px;
-            height: 60px;
-            background: #666;
-            bottom: -65px;
-            left: 50%;
-            transform: translateX(-50%);
-        }
-
-        .balloon-shine {
-            width: 25px;
-            height: 35px;
-            background: rgba(255, 255, 255, 0.3);
-            border-radius: 50%;
-            position: absolute;
-            top: 15px;
-            left: 15px;
-        }
-
-        .home-intentions {
-            background: #f7fafc;
-            border-radius: 12px;
-            padding: 20px;
-            margin-bottom: 24px;
-        }
-
-        .home-intentions h3 {
-            font-size: 14px;
-            color: #718096;
-            margin-bottom: 8px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .home-intentions p {
-            font-size: 18px;
-            color: #2d3748;
-            line-height: 1.5;
-        }
-
-        .practice-content {
-            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
-            border-radius: 16px;
-            padding: 32px;
+            box-shadow: 0 8px 40px rgba(210,149,106,0.35);
             margin: 24px 0;
-            text-align: center;
-            min-height: 350px;
+            position: relative;
+            overflow: hidden;
+        }
+        .pause-btn::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: radial-gradient(circle at 30% 40%, rgba(255,255,255,0.15), transparent 60%);
+        }
+        .pause-btn:hover { transform: scale(1.03); box-shadow: 0 12px 48px rgba(210,149,106,0.4); }
+
+        /* Horizon visual */
+        .horizon {
+            width: 100%;
+            height: 240px;
+            position: relative;
+            overflow: hidden;
+            border-radius: 0 0 32px 32px;
+        }
+        .horizon-sky {
+            position: absolute; top: 0; left: 0; right: 0; height: 65%;
+            background: linear-gradient(180deg, #8AAEC4 0%, #B5D0D8 40%, #E4C8A8 75%, #E8B88A 100%);
+        }
+        .horizon-water {
+            position: absolute; bottom: 0; left: 0; right: 0; height: 40%;
+            background: linear-gradient(180deg, #7AACB8 0%, #5A8E98 50%, #3D6E78 100%);
+        }
+        .horizon-light {
+            position: absolute; bottom: 35%; left: 50%; transform: translateX(-50%);
+            width: 120px; height: 60px;
+            background: radial-gradient(ellipse, rgba(255,220,180,0.7) 0%, transparent 70%);
+        }
+        .horizon-shimmer {
+            position: absolute; bottom: 20%; left: 30%; right: 30%; height: 2px;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.5), transparent);
+            animation: shimmer 4s ease-in-out infinite;
+        }
+        @keyframes shimmer { 0%,100% { opacity: 0.3; } 50% { opacity: 0.8; } }
+
+        .wheel-svg {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -55%);
+            width: 120px; height: 120px;
+            animation: slowSpin 30s linear infinite;
+            opacity: 0.6;
+        }
+        @keyframes slowSpin { from { transform: translate(-50%,-55%) rotate(0); } to { transform: translate(-50%,-55%) rotate(360deg); } }
+
+        /* Practice cards */
+        .practice-card {
+            background: white;
+            border-radius: 20px;
+            padding: 22px 24px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+            border: 1.5px solid transparent;
+            box-shadow: 0 2px 12px rgba(44,74,82,0.05);
+        }
+        .practice-card:hover { transform: translateY(-3px); border-color: var(--ocean-pale); box-shadow: 0 6px 24px rgba(44,74,82,0.1); }
+        .practice-card h3 { font-family: 'Cormorant Garamond', serif; font-size: 21px; font-weight: 500; color: var(--ocean-deep); margin-bottom: 6px; }
+        .practice-card p { font-size: 13px; color: var(--text-light); line-height: 1.5; font-weight: 300; }
+
+        /* Practice stage */
+        .stage {
+            flex: 1;
             display: flex;
             flex-direction: column;
             justify-content: center;
+            align-items: center;
+            padding: 32px 28px;
+            text-align: center;
+            position: relative;
         }
 
-        .breath-circle {
-            width: 120px;
-            height: 120px;
+        .stage-metta {
+            background: linear-gradient(170deg, #F5EDE3 0%, #E8D8C8 30%, #D4C0AE 100%);
+        }
+        .stage-gratitude {
+            background: linear-gradient(170deg, #D6E8E4 0%, #B8D8D4 30%, #94C5BE 100%);
+        }
+        .stage-memory {
+            background: linear-gradient(170deg, #E8E0D8 0%, #D8CCC0 30%, #C8B8A8 100%);
+        }
+
+        .practice-icon {
+            width: 80px; height: 80px;
             border-radius: 50%;
-            background: rgba(255, 255, 255, 0.3);
-            margin: 0 auto 24px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 36px;
+            margin-bottom: 24px;
+            background: rgba(255,255,255,0.4);
+            backdrop-filter: blur(8px);
+            animation: gentlePulse 5s ease-in-out infinite;
+        }
+        @keyframes gentlePulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.06); } }
+
+        .step-text {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 22px;
+            font-weight: 400;
+            line-height: 1.6;
+            color: var(--ocean-deep);
+            min-height: 120px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 48px;
-            animation: breathePulse 4s ease-in-out infinite;
+            padding: 0 8px;
         }
 
-        @keyframes breathePulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.15); }
+        .step-instruction {
+            font-size: 13px;
+            color: var(--text-light);
+            font-style: italic;
+            margin-top: 12px;
+            min-height: 20px;
+            font-weight: 300;
         }
 
-        .practice-text {
-            font-size: 18px;
-            color: #2d3748;
-            line-height: 1.8;
-            margin-bottom: 16px;
-            min-height: 80px;
+        /* Progress */
+        .pips {
+            display: flex; gap: 6px; justify-content: center;
+            margin: 20px 0;
         }
-
-        .timer-display {
-            font-size: 48px;
-            font-weight: 700;
-            color: #667eea;
-            margin: 16px 0;
-            font-variant-numeric: tabular-nums;
+        .pip {
+            width: 8px; height: 8px; border-radius: 50%;
+            background: rgba(44,74,82,0.15);
+            transition: all 0.4s ease;
         }
+        .pip.on { background: var(--ocean-mid); transform: scale(1.3); }
 
-        .timer-label {
-            font-size: 14px;
-            color: #718096;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
+        /* Content area */
+        .content { padding: 28px 28px 32px; flex: 1; display: flex; flex-direction: column; }
+        .content-scroll { flex: 1; }
 
-        .progress-dots {
-            display: flex;
-            justify-content: center;
-            gap: 8px;
-            margin: 24px 0;
-        }
-
-        .dot {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            background: #cbd5e0;
-            transition: all 0.3s;
-        }
-
-        .dot.active {
-            background: #667eea;
-            transform: scale(1.3);
-        }
-
-        .check-in {
-            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
-            border-radius: 16px;
-            padding: 24px;
-            margin: 24px 0;
-        }
-
-        .emoji-btn {
-            font-size: 48px;
+        /* Intention */
+        .intention-display {
             background: white;
-            border: none;
-            border-radius: 12px;
-            padding: 16px;
-            margin: 8px;
-            cursor: pointer;
-            transition: transform 0.2s;
+            border-radius: 16px;
+            padding: 18px 22px;
+            margin-bottom: 20px;
+            border: 1px solid var(--sand-dark);
+        }
+        .intention-display label {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--text-light);
+            display: block;
+            margin-bottom: 6px;
+        }
+        .intention-display p {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 19px;
+            color: var(--ocean-deep);
+            font-weight: 400;
         }
 
-        .emoji-btn:hover {
-            transform: scale(1.1);
-        }
-
-        .back-btn {
-            background: transparent;
-            border: none;
-            color: #667eea;
-            font-size: 16px;
-            cursor: pointer;
-            padding: 8px;
-            margin-bottom: 16px;
-        }
-
-        .back-btn:hover {
-            text-decoration: underline;
-        }
-
-        .schedule-card {
-            background: #f7fafc;
-            border: 2px solid #e2e8f0;
-            border-radius: 12px;
-            padding: 16px;
-            margin-bottom: 12px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .schedule-info {
-            flex: 1;
-        }
-
-        .schedule-time {
-            font-size: 18px;
-            font-weight: 600;
-            color: #2d3748;
-            margin-bottom: 4px;
-        }
-
-        .schedule-label {
-            font-size: 14px;
-            color: #718096;
-        }
-
-        .delete-schedule {
-            background: #fee;
-            color: #c53030;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 14px;
-        }
-
-        .time-input {
-            padding: 12px;
-            border: 2px solid #e2e8f0;
-            border-radius: 8px;
-            font-size: 16px;
+        textarea, input[type="text"], input[type="time"] {
             width: 100%;
+            padding: 14px 18px;
+            border: 1.5px solid var(--sand-dark);
+            border-radius: 14px;
+            font-size: 15px;
+            font-family: 'Nunito Sans', sans-serif;
+            color: var(--text);
+            background: white;
+            transition: border-color 0.2s;
             margin-bottom: 12px;
         }
+        textarea:focus, input:focus { outline: none; border-color: var(--ocean-mid); }
 
-        .small-btn {
-            padding: 10px 20px;
-            font-size: 14px;
+        .preset {
+            display: inline-block;
+            background: white;
+            border: 1.5px solid var(--sand-dark);
+            padding: 10px 16px;
+            border-radius: 24px;
+            font-size: 13px;
+            cursor: pointer;
+            margin: 4px 4px 4px 0;
+            transition: all 0.2s;
+            font-family: 'Nunito Sans', sans-serif;
+            color: var(--text);
         }
+        .preset:hover { border-color: var(--ocean-mid); background: var(--ocean-pale); color: var(--ocean-deep); }
+
+        /* Gratitude balloon/sky */
+        .sky {
+            border-radius: 20px;
+            padding: 32px 20px;
+            min-height: 320px;
+            position: relative;
+            overflow: hidden;
+            background: linear-gradient(180deg, #1E3A5F 0%, #4A7C9E 25%, #7AACBE 45%, #B0D4DC 60%, #E0EEE8 80%, #F5F0E8 100%);
+        }
+        .cloud-shape {
+            position: absolute;
+            background: rgba(255,255,255,0.6);
+            border-radius: 80px;
+            animation: drift 35s linear infinite;
+        }
+        .cloud-shape.c1 { width: 70px; height: 24px; top: 55%; left: -70px; }
+        .cloud-shape.c2 { width: 90px; height: 28px; top: 62%; left: -90px; animation-delay: 12s; }
+        .cloud-shape.c3 { width: 60px; height: 20px; top: 50%; left: -60px; animation-delay: 22s; }
+        @keyframes drift { from { transform: translateX(0); } to { transform: translateX(520px); } }
+
+        .balloon-el {
+            width: 60px; height: 75px;
+            background: linear-gradient(145deg, var(--sunset) 0%, var(--rose) 100%);
+            border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+            position: absolute; left: 50%; bottom: 12%;
+            transform: translateX(-50%);
+            transition: bottom 3.5s cubic-bezier(0.34, 1.4, 0.64, 1);
+            animation: sway 5s ease-in-out infinite;
+        }
+        .balloon-el.fly { bottom: 75%; }
+        .balloon-el::after {
+            content: ''; position: absolute;
+            width: 1.5px; height: 50px;
+            background: rgba(44,74,82,0.25);
+            bottom: -52px; left: 50%; transform: translateX(-50%);
+        }
+        .balloon-glow {
+            width: 18px; height: 28px;
+            background: rgba(255,255,255,0.3);
+            border-radius: 50%;
+            position: absolute; top: 12px; left: 12px;
+        }
+        @keyframes sway { 0%,100% { transform: translateX(-50%) rotate(-2deg); } 50% { transform: translateX(-50%) rotate(2deg); } }
+
+        /* Return screen */
+        .return-stage {
+            flex: 1;
+            background: linear-gradient(170deg, var(--sand-light) 0%, var(--ocean-pale) 100%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 32px;
+            text-align: center;
+        }
+
+        .emoji-row { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; margin: 16px 0; }
+        .emoji-btn {
+            font-size: 36px; background: white; border: 1.5px solid var(--sand-dark);
+            border-radius: 14px; padding: 12px 16px; cursor: pointer;
+            transition: all 0.2s;
+        }
+        .emoji-btn:hover { transform: scale(1.1); border-color: var(--ocean-mid); }
+
+        .schedule-item {
+            background: white; border-radius: 14px; padding: 14px 18px;
+            margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;
+            border: 1px solid var(--sand-dark);
+        }
+        .del-btn {
+            background: var(--rose-light); color: var(--rose); border: none;
+            padding: 6px 14px; border-radius: 8px; cursor: pointer; font-size: 13px;
+        }
+
+        .spacer { height: 12px; }
     </style>
 </head>
 <body>
-    <div class="app-container">
-        <!-- Welcome Screen -->
-        <div class="screen active" id="welcome">
-            <div class="horizon-visual">
-                <div class="ship-wheel-container">
-                    <div class="ship-wheel">
-                        <div class="wheel-rim"></div>
-                        <div class="wheel-spoke" style="transform: rotate(0deg) translateX(-50%);"></div>
-                        <div class="wheel-spoke" style="transform: rotate(45deg) translateX(-50%);"></div>
-                        <div class="wheel-spoke" style="transform: rotate(90deg) translateX(-50%);"></div>
-                        <div class="wheel-spoke" style="transform: rotate(135deg) translateX(-50%);"></div>
-                        <div class="wheel-spoke" style="transform: rotate(180deg) translateX(-50%);"></div>
-                        <div class="wheel-spoke" style="transform: rotate(225deg) translateX(-50%);"></div>
-                        <div class="wheel-spoke" style="transform: rotate(270deg) translateX(-50%);"></div>
-                        <div class="wheel-spoke" style="transform: rotate(315deg) translateX(-50%);"></div>
-                        <div class="wheel-center"></div>
-                    </div>
-                </div>
-                <div class="ocean-horizon"></div>
-            </div>
-            <h1>Welcome to Sacred Pause</h1>
-            <p class="subtitle">A tool to help you pause, re-regulate, and return to who you want to be.</p>
-            <p class="subtitle">Let's start by setting your intention - where are you steering your ship?</p>
-            <button class="btn-primary" onclick="showScreen('setIntention')">Set My Intention</button>
+<div class="app">
+
+    <!-- WELCOME -->
+    <div class="screen active" id="welcome">
+        <div class="horizon">
+            <div class="horizon-sky"></div>
+            <div class="horizon-water"></div>
+            <div class="horizon-light"></div>
+            <div class="horizon-shimmer"></div>
+            <svg class="wheel-svg" viewBox="0 0 100 100">
+                <circle cx="50" cy="50" r="45" fill="none" stroke="rgba(255,255,255,0.5)" stroke-width="4"/>
+                <circle cx="50" cy="50" r="10" fill="rgba(255,255,255,0.4)"/>
+                <line x1="50" y1="5" x2="50" y2="95" stroke="rgba(255,255,255,0.35)" stroke-width="2.5"/>
+                <line x1="5" y1="50" x2="95" y2="50" stroke="rgba(255,255,255,0.35)" stroke-width="2.5"/>
+                <line x1="18" y1="18" x2="82" y2="82" stroke="rgba(255,255,255,0.35)" stroke-width="2.5"/>
+                <line x1="82" y1="18" x2="18" y2="82" stroke="rgba(255,255,255,0.35)" stroke-width="2.5"/>
+            </svg>
         </div>
-
-        <!-- Set Intention Screen -->
-        <div class="screen" id="setIntention">
-            <button class="back-btn" onclick="showScreen('welcome')">← Back</button>
-            <div class="horizon-visual">
-                <div class="ship-wheel-container">
-                    <div class="ship-wheel">
-                        <div class="wheel-rim"></div>
-                        <div class="wheel-spoke" style="transform: rotate(0deg) translateX(-50%);"></div>
-                        <div class="wheel-spoke" style="transform: rotate(45deg) translateX(-50%);"></div>
-                        <div class="wheel-spoke" style="transform: rotate(90deg) translateX(-50%);"></div>
-                        <div class="wheel-spoke" style="transform: rotate(135deg) translateX(-50%);"></div>
-                        <div class="wheel-spoke" style="transform: rotate(180deg) translateX(-50%);"></div>
-                        <div class="wheel-spoke" style="transform: rotate(225deg) translateX(-50%);"></div>
-                        <div class="wheel-spoke" style="transform: rotate(270deg) translateX(-50%);"></div>
-                        <div class="wheel-spoke" style="transform: rotate(315deg) translateX(-50%);"></div>
-                        <div class="wheel-center"></div>
-                    </div>
-                </div>
-                <div class="ocean-horizon"></div>
-            </div>
-            <h2>Set Your Intention</h2>
-            <p class="subtitle">Who is your higher self? What matters most about who you're trying to be?</p>
-            
-            <div class="preset-intentions">
-                <p style="font-size: 14px; color: #718096; margin-bottom: 12px;">Tap to use or customize:</p>
-                <button class="preset-btn" onclick="setPreset('Be present and patient with my family')">Be present with my family</button>
-                <button class="preset-btn" onclick="setPreset('Respond with curiosity, not defensiveness')">Respond with curiosity</button>
-                <button class="preset-btn" onclick="setPreset('Show up with kindness and compassion')">Show up with kindness</button>
-                <button class="preset-btn" onclick="setPreset('Stay grounded in what truly matters')">Stay grounded</button>
-                <button class="preset-btn" onclick="setPreset('Make the world a little better')">Make the world better</button>
-            </div>
-
-            <textarea class="intention-input" id="intentionText" rows="4" placeholder="Or write your own intention..."></textarea>
-            
-            <button class="btn-primary" onclick="saveIntention()">Save My Intention</button>
-        </div>
-
-        <!-- Home Screen -->
-        <div class="screen" id="home">
+        <div class="content">
             <h1>Sacred Pause</h1>
-            
-            <div class="home-intentions">
-                <h3>Your Intention</h3>
-                <p id="displayIntention">Be present and kind</p>
-            </div>
-
-            <button class="sacred-pause-btn" onclick="showScreen('selectPractice')">
-                PAUSE
-            </button>
-
-            <button class="btn-secondary" onclick="showScreen('schedules')">⏰ Schedule Pauses</button>
-            <button class="btn-secondary" onclick="showScreen('setIntention')">✏️ Update My Intention</button>
-        </div>
-
-        <!-- Scheduled Pauses Screen -->
-        <div class="screen" id="schedules">
-            <button class="back-btn" onclick="showScreen('home')">← Back</button>
-            <h2>Scheduled Pauses</h2>
-            <p class="subtitle">Set up proactive pauses before challenging moments</p>
-
-            <div id="scheduleList"></div>
-
-            <div style="margin-top: 24px; padding-top: 24px; border-top: 2px solid #e2e8f0;">
-                <h3 style="font-size: 16px; margin-bottom: 12px; color: #2d3748;">Add New Schedule</h3>
-                <input type="time" class="time-input" id="scheduleTime">
-                <input type="text" class="intention-input" id="scheduleLabel" placeholder="Label (e.g., 'Before team meeting')" style="margin-bottom: 12px;">
-                <button class="btn-primary" onclick="addSchedule()">Add Scheduled Pause</button>
-            </div>
-        </div>
-
-        <!-- Select Practice Screen -->
-        <div class="screen" id="selectPractice">
-            <button class="back-btn" onclick="showScreen('home')">← Back</button>
-            <h2>Choose Your Practice</h2>
-            <p class="subtitle">What will help you re-regulate right now?</p>
-
-            <div class="practice-card" onclick="startPractice('metta')">
-                <h3>💗 Loving-Kindness (Metta)</h3>
-                <p>Extend care and safety to yourself, others, and the person you're in tension with</p>
-            </div>
-
-            <div class="practice-card" onclick="startPractice('gratitude')">
-                <h3>🎈 Gratitude Lifting</h3>
-                <p>Rise above the clouds of this moment and see what's truly real</p>
-            </div>
-
-            <div class="practice-card" onclick="startPractice('memory')">
-                <h3>✨ Happy Memory</h3>
-                <p>Connect with a moment of joy, safety, or peace</p>
-            </div>
-        </div>
-
-        <!-- Metta Practice Screen -->
-        <div class="screen" id="mettaPractice">
-            <button class="back-btn" onclick="showScreen('selectPractice')">← Choose Different Practice</button>
-            <h2>Loving-Kindness Practice</h2>
-            
-            <div class="practice-content">
-                <div class="breath-circle">💗</div>
-                <div class="practice-text" id="mettaText">
-                    Take a deep breath...
-                </div>
-                <div class="progress-dots">
-                    <div class="dot active"></div>
-                    <div class="dot"></div>
-                    <div class="dot"></div>
-                    <div class="dot"></div>
-                    <div class="dot"></div>
-                    <div class="dot"></div>
-                </div>
-            </div>
-
-            <button class="btn-primary" id="mettaNextBtn" onclick="nextMettaStep()">Next</button>
-            <button class="btn-secondary" onclick="completePractice()">I'm Ready to Return</button>
-        </div>
-
-        <!-- Gratitude Practice Screen -->
-        <div class="screen" id="gratitudePractice">
-            <button class="back-btn" onclick="showScreen('selectPractice')">← Choose Different Practice</button>
-            <h2>Gratitude Practice</h2>
-            
-            <div class="sky-container" id="skyContainer">
-                <div class="cloud cloud-1"></div>
-                <div class="cloud cloud-2"></div>
-                <div class="cloud cloud-3"></div>
-                <div class="balloon" id="gratitudeBalloon">
-                    <div class="balloon-shine"></div>
-                </div>
-            </div>
-
-            <div style="text-align: center; padding: 20px;">
-                <div class="practice-text" id="gratitudeText">
-                    Let gratitude lift you above the clouds...
-                </div>
-                <div class="progress-dots">
-                    <div class="dot active"></div>
-                    <div class="dot"></div>
-                    <div class="dot"></div>
-                    <div class="dot"></div>
-                    <div class="dot"></div>
-                </div>
-            </div>
-
-            <button class="btn-primary" id="gratitudeNextBtn" onclick="nextGratitudeStep()">Next</button>
-            <button class="btn-secondary" onclick="completePractice()">I'm Ready to Return</button>
-        </div>
-
-        <!-- Memory Practice Screen -->
-        <div class="screen" id="memoryPractice">
-            <button class="back-btn" onclick="showScreen('selectPractice')">← Choose Different Practice</button>
-            <h2>Happy Memory Practice</h2>
-            
-            <div class="practice-content">
-                <div class="breath-circle">✨</div>
-                <div class="practice-text" id="memoryText">
-                    Close your eyes and breathe...
-                </div>
-                <div class="progress-dots">
-                    <div class="dot active"></div>
-                    <div class="dot"></div>
-                    <div class="dot"></div>
-                    <div class="dot"></div>
-                </div>
-            </div>
-
-            <button class="btn-primary" id="memoryNextBtn" onclick="nextMemoryStep()">Next</button>
-            <button class="btn-secondary" onclick="completePractice()">I'm Ready to Return</button>
-        </div>
-
-        <!-- Return Screen -->
-        <div class="screen" id="return">
-            <div class="practice-content">
-                <div class="breath-circle">🌟</div>
-                <h2>You're Ready</h2>
-                <p class="practice-text">Take one more deep breath.</p>
-                <p class="practice-text">Remember your intention.</p>
-                <p class="practice-text" id="returnIntention" style="font-weight: 600; font-size: 20px;">Be present and kind</p>
-            </div>
-
-            <button class="btn-primary" onclick="returnToHome()">Return to the Moment</button>
-        </div>
-
-        <!-- Check-in Screen -->
-        <div class="screen" id="checkin">
-            <h2>How Did It Go?</h2>
-            <p class="subtitle">You paused about an hour ago. How was your experience?</p>
-            
-            <div class="check-in">
-                <p style="text-align: center; margin-bottom: 16px; font-size: 18px; color: #2d3748;">The pause helped me...</p>
-                <div style="text-align: center;">
-                    <button class="emoji-btn" onclick="recordCheckIn('helped-lot')" title="Really helped!">😊</button>
-                    <button class="emoji-btn" onclick="recordCheckIn('helped-some')" title="Helped somewhat">🙂</button>
-                    <button class="emoji-btn" onclick="recordCheckIn('neutral')" title="Neutral">😐</button>
-                    <button class="emoji-btn" onclick="recordCheckIn('not-much')" title="Didn't help much">😕</button>
-                </div>
-            </div>
-
-            <button class="btn-secondary" onclick="showScreen('home')">Back to Home</button>
+            <div class="spacer"></div>
+            <p class="body-text">A place to pause, re-regulate, and return to who you want to be.</p>
+            <p class="body-text" style="margin-top:8px;">Start by setting your intention. Where are you steering your ship?</p>
+            <div style="flex:1;"></div>
+            <button class="btn btn-main" onclick="go('setIntention')">Set my intention</button>
         </div>
     </div>
 
-    <script>
-        let currentIntention = "Be present and kind";
-        let mettaStep = 0;
-        let gratitudeStep = 0;
-        let memoryStep = 0;
-        let schedules = [];
+    <!-- SET INTENTION -->
+    <div class="screen" id="setIntention">
+        <div class="horizon" style="height:160px;">
+            <div class="horizon-sky"></div>
+            <div class="horizon-water"></div>
+            <div class="horizon-light"></div>
+            <svg class="wheel-svg" style="width:80px;height:80px;" viewBox="0 0 100 100">
+                <circle cx="50" cy="50" r="45" fill="none" stroke="rgba(255,255,255,0.5)" stroke-width="4"/>
+                <circle cx="50" cy="50" r="10" fill="rgba(255,255,255,0.4)"/>
+                <line x1="50" y1="5" x2="50" y2="95" stroke="rgba(255,255,255,0.35)" stroke-width="2.5"/>
+                <line x1="5" y1="50" x2="95" y2="50" stroke="rgba(255,255,255,0.35)" stroke-width="2.5"/>
+                <line x1="18" y1="18" x2="82" y2="82" stroke="rgba(255,255,255,0.35)" stroke-width="2.5"/>
+                <line x1="82" y1="18" x2="18" y2="82" stroke="rgba(255,255,255,0.35)" stroke-width="2.5"/>
+            </svg>
+        </div>
+        <div class="content">
+            <button class="back-link" onclick="go('welcome')">← Back</button>
+            <div class="spacer"></div>
+            <h2>Set your intention</h2>
+            <p class="body-text" style="margin-bottom:16px;">Who is your higher self? What matters most about who you're trying to be?</p>
 
-        const mettaSteps = [
-            "Take a deep breath. Place your hand on your heart.",
-            "May I be safe. May I be held with care. May I know I am enough.",
-            "Think of someone you love deeply. May they be safe. May they be held with care. May they know peace.",
-            "Think of your broader community - neighbors, colleagues. May they be safe. May they be held with care.",
-            "Think of strangers, people you pass on the street. May they too be safe. May they know they belong.",
-            "Now think of someone you're struggling with - not the person you're in tension with right now, but someone else. May they be safe. May they be free from suffering.",
-            "Finally, bring to mind the person you're in tension with right now. Take a breath. May they be safe. May they be held with care. May we both find our way through this."
-        ];
+            <div style="margin-bottom:16px;">
+                <button class="preset" onclick="document.getElementById('intentionField').value='Be present and patient with my family'">Present with family</button>
+                <button class="preset" onclick="document.getElementById('intentionField').value='Respond with curiosity, not defensiveness'">Respond with curiosity</button>
+                <button class="preset" onclick="document.getElementById('intentionField').value='Show up with kindness and compassion'">Kindness &amp; compassion</button>
+                <button class="preset" onclick="document.getElementById('intentionField').value='Stay grounded in what truly matters'">Stay grounded</button>
+            </div>
 
-        const gratitudeSteps = [
-            "Close your eyes. Take three deep breaths. Let gratitude be your balloon...",
-            "Thank you for this breath. Thank you for this body that carries me through life.",
-            "Thank you for the people who love me. Thank you for being loved.",
-            "Thank you for this moment, exactly as it is. Even the hard parts are teaching me.",
-            "What are you deeply grateful for right now? Let yourself feel it in your chest. Stay with that feeling.",
-            "You're rising above the clouds. From up here, you can see clearly. What really matters?"
-        ];
+            <textarea id="intentionField" rows="3" placeholder="Or write your own..."></textarea>
+            <button class="btn btn-main" onclick="saveIntention()">Save</button>
+        </div>
+    </div>
 
-        const memorySteps = [
-            "Close your eyes. Breathe deeply.",
-            "Think of a time when you felt completely safe, loved, or joyful. Let yourself see it clearly.",
-            "Where were you? Who was there? What did it feel like in your body?",
-            "Stay with that feeling. Let it fill you up. This is real. This is true.",
-            "You can return to this feeling anytime you need it. It's always here."
-        ];
+    <!-- HOME -->
+    <div class="screen" id="home">
+        <div class="content" style="padding-top:40px;">
+            <h1>Sacred Pause</h1>
+            <div class="spacer"></div>
+            <div class="intention-display">
+                <label>Your intention</label>
+                <p id="showIntention">Be present and kind</p>
+            </div>
+            <button class="pause-btn" onclick="go('selectPractice')">Pause</button>
+            <button class="btn btn-soft" onclick="go('schedules')">Schedule pauses</button>
+            <button class="btn btn-soft" onclick="go('setIntention')">Update intention</button>
+        </div>
+    </div>
 
-        function showScreen(screenId) {
-            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-            document.getElementById(screenId).classList.add('active');
-            
-            if (screenId === 'schedules') {
-                renderSchedules();
-            }
-        }
+    <!-- SCHEDULES -->
+    <div class="screen" id="schedules">
+        <div class="content">
+            <button class="back-link" onclick="go('home')">← Back</button>
+            <div class="spacer"></div>
+            <h2>Scheduled pauses</h2>
+            <p class="body-text" style="margin-bottom:20px;">Set proactive pauses before challenging moments.</p>
+            <div id="schedList"></div>
+            <div style="margin-top:20px;padding-top:18px;border-top:1px solid var(--sand-dark);">
+                <input type="time" id="schedTime">
+                <input type="text" id="schedLabel" placeholder="Label (e.g. Before team meeting)">
+                <button class="btn btn-main" onclick="addSched()">Add</button>
+            </div>
+        </div>
+    </div>
 
-        function setPreset(text) {
-            document.getElementById('intentionText').value = text;
-        }
+    <!-- SELECT PRACTICE -->
+    <div class="screen" id="selectPractice">
+        <div class="content">
+            <button class="back-link" onclick="go('home')">← Back</button>
+            <div class="spacer"></div>
+            <h2>Choose your practice</h2>
+            <p class="body-text" style="margin-bottom:20px;">What will help you come back to yourself right now?</p>
 
-        function saveIntention() {
-            const text = document.getElementById('intentionText').value.trim();
-            if (text) {
-                currentIntention = text;
-                document.getElementById('displayIntention').textContent = text;
-                document.getElementById('returnIntention').textContent = text;
-            }
-            showScreen('home');
-        }
+            <div class="practice-card" onclick="beginPractice('metta')">
+                <h3>Loving-kindness</h3>
+                <p>Extend warmth and safety outward in expanding circles, from yourself to all beings</p>
+            </div>
+            <div class="practice-card" onclick="beginPractice('gratitude')">
+                <h3>Gratitude lifting</h3>
+                <p>Let gratitude carry you above the clouds and trace where the good things in your life come from</p>
+            </div>
+            <div class="practice-card" onclick="beginPractice('memory')">
+                <h3>Happy memory</h3>
+                <p>Return to a moment of joy, safety, or peace with all your senses</p>
+            </div>
+        </div>
+    </div>
 
-        function startPractice(type) {
-            if (type === 'metta') {
-                mettaStep = 0;
-                updateMettaDisplay();
-                showScreen('mettaPractice');
-            } else if (type === 'gratitude') {
-                gratitudeStep = 0;
-                updateGratitudeDisplay();
-                showScreen('gratitudePractice');
-            } else if (type === 'memory') {
-                memoryStep = 0;
-                updateMemoryDisplay();
-                showScreen('memoryPractice');
-            }
-        }
+    <!-- METTA PRACTICE -->
+    <div class="screen" id="mettaScreen">
+        <div class="stage stage-metta">
+            <button class="back-link" style="position:absolute;top:20px;left:24px;color:var(--ocean-deep);" onclick="go('selectPractice')">← Different practice</button>
+            <div class="practice-icon">💗</div>
+            <div class="step-text" id="mettaWords"></div>
+            <div class="step-instruction" id="mettaHint"></div>
+            <div class="pips" id="mettaPips"></div>
+        </div>
+        <div style="padding:16px 28px 28px;">
+            <button class="btn btn-main" id="mettaBtn" onclick="nextMetta()">Next</button>
+            <button class="btn btn-soft" onclick="finish()">I'm ready to return</button>
+        </div>
+    </div>
 
-        // METTA PRACTICE
-        function updateMettaDisplay() {
-            document.getElementById('mettaText').textContent = mettaSteps[mettaStep];
-            const dots = document.querySelectorAll('#mettaPractice .dot');
-            dots.forEach((dot, i) => {
-                dot.classList.toggle('active', i === mettaStep);
-            });
-        }
+    <!-- GRATITUDE PRACTICE -->
+    <div class="screen" id="gratScreen">
+        <div style="flex:1;display:flex;flex-direction:column;">
+            <div style="padding:16px 24px 0;">
+                <button class="back-link" onclick="go('selectPractice')">← Different practice</button>
+            </div>
+            <div class="sky" style="margin:12px 16px;flex:1;">
+                <div class="cloud-shape c1"></div>
+                <div class="cloud-shape c2"></div>
+                <div class="cloud-shape c3"></div>
+                <div class="balloon-el" id="balloon"><div class="balloon-glow"></div></div>
+            </div>
+            <div style="padding:8px 28px;text-align:center;">
+                <div class="step-text" id="gratWords" style="font-size:19px;min-height:90px;"></div>
+                <div class="step-instruction" id="gratHint"></div>
+                <div class="pips" id="gratPips"></div>
+            </div>
+        </div>
+        <div style="padding:8px 28px 28px;">
+            <button class="btn btn-main" onclick="nextGrat()">Next</button>
+            <button class="btn btn-soft" onclick="finish()">I'm ready to return</button>
+        </div>
+    </div>
 
-        function nextMettaStep() {
-            if (mettaStep < mettaSteps.length - 1) {
-                mettaStep++;
-                updateMettaDisplay();
-            } else {
-                completePractice();
-            }
-        }
+    <!-- MEMORY PRACTICE -->
+    <div class="screen" id="memScreen">
+        <div class="stage stage-memory">
+            <button class="back-link" style="position:absolute;top:20px;left:24px;color:var(--ocean-deep);" onclick="go('selectPractice')">← Different practice</button>
+            <div class="practice-icon">✨</div>
+            <div class="step-text" id="memWords"></div>
+            <div class="step-instruction" id="memHint"></div>
+            <div class="pips" id="memPips"></div>
+        </div>
+        <div style="padding:16px 28px 28px;">
+            <button class="btn btn-main" onclick="nextMem()">Next</button>
+            <button class="btn btn-soft" onclick="finish()">I'm ready to return</button>
+        </div>
+    </div>
 
-        // GRATITUDE PRACTICE
-        function updateGratitudeDisplay() {
-            document.getElementById('gratitudeText').textContent = gratitudeSteps[gratitudeStep];
-            const dots = document.querySelectorAll('#gratitudePractice .dot');
-            dots.forEach((dot, i) => {
-                dot.classList.toggle('active', i === gratitudeStep);
-            });
-            
-            // Balloon rises as we progress through gratitude
-            const balloon = document.getElementById('gratitudeBalloon');
-            if (gratitudeStep >= 3) {
-                balloon.classList.add('rising');
-            } else {
-                balloon.classList.remove('rising');
-            }
-        }
+    <!-- RETURN -->
+    <div class="screen" id="returnScreen">
+        <div class="return-stage">
+            <div class="practice-icon" style="margin-bottom:28px;">🌿</div>
+            <h1 style="margin-bottom:16px;">You're ready</h1>
+            <p class="body-text" style="margin-bottom:8px;">Take one more deep breath.</p>
+            <p class="body-text" style="margin-bottom:24px;">Remember your intention:</p>
+            <p class="serif" id="retIntention" style="font-size:24px;color:var(--ocean-deep);font-weight:500;"></p>
+        </div>
+        <div style="padding:16px 28px 32px;">
+            <button class="btn btn-main" onclick="returnHome()">Return to the moment</button>
+        </div>
+    </div>
 
-        function nextGratitudeStep() {
-            if (gratitudeStep < gratitudeSteps.length - 1) {
-                gratitudeStep++;
-                updateGratitudeDisplay();
-            } else {
-                completePractice();
-            }
-        }
+    <!-- CHECK-IN -->
+    <div class="screen" id="checkin">
+        <div class="content" style="justify-content:center;text-align:center;">
+            <h2>How did it go?</h2>
+            <p class="body-text" style="margin:12px 0 24px;">You paused a little while ago. How was your experience?</p>
+            <p style="font-size:16px;color:var(--ocean-deep);margin-bottom:16px;">The pause helped me...</p>
+            <div class="emoji-row">
+                <button class="emoji-btn" onclick="checkin('great')">😊</button>
+                <button class="emoji-btn" onclick="checkin('some')">🙂</button>
+                <button class="emoji-btn" onclick="checkin('neutral')">😐</button>
+                <button class="emoji-btn" onclick="checkin('not-much')">😕</button>
+            </div>
+            <div class="spacer"></div>
+            <button class="btn btn-soft" onclick="go('home')">Back home</button>
+        </div>
+    </div>
 
-        // MEMORY PRACTICE
-        function updateMemoryDisplay() {
-            document.getElementById('memoryText').textContent = memorySteps[memoryStep];
-            const dots = document.querySelectorAll('#memoryPractice .dot');
-            dots.forEach((dot, i) => {
-                dot.classList.toggle('active', i === memoryStep);
-            });
-        }
+</div>
 
-        function nextMemoryStep() {
-            if (memoryStep < memorySteps.length - 1) {
-                memoryStep++;
-                updateMemoryDisplay();
-            } else {
-                completePractice();
-            }
-        }
+<script>
+let intention = 'Be present and kind';
+let scheds = [];
 
-        function completePractice() {
-            document.getElementById('returnIntention').textContent = currentIntention;
-            showScreen('return');
-        }
+// ─── METTA (Loving-Kindness) ───
+const metta = [
+    { text: "Place your hand on your heart. Feel the weight and warmth of it. Take a slow, deep breath.",
+      hint: "Let yourself arrive." },
+    { text: "May I be safe. May I be held with care. May I experience happiness, and the root of happiness. May I know I am enough.",
+      hint: "Breathe these words in like they're meant for you, because they are." },
+    { text: "Now picture someone you love deeply. See their face. May you be safe. May you be held with care. May you experience happiness, and the root of happiness.",
+      hint: "Let their face come to you. A partner, a child, a dear friend. See them clearly." },
+    { text: "Picture your closest people. Your family. Your dearest friends. See each of their faces. May you all be safe. May you all be held with care.",
+      hint: "Let them gather in your mind. Each beloved face." },
+    { text: "Now think of the people in your wider circle. Colleagues. Neighbors. Familiar faces. May you be safe. May you know peace. May you be held with care.",
+      hint: "Picture the people you see regularly but don't know deeply." },
+    { text: "Think of strangers. The person in the car driving past. The cashier at the store. People you'll never meet. May you be safe. May you be free from suffering.",
+      hint: "Imagine the faces you passed today without noticing." },
+    { text: "Now, gently, bring to mind someone in your life who you're having trouble with. Take a breath. May you be safe. May you be held with care. May we both find our way through this.",
+      hint: "This is hard. Be gentle with yourself. You don't have to force anything." },
+    { text: "Now think of people in the world who you struggle with. People whose actions you don't understand. Take a breath. May you too be safe. May you find your way to peace.",
+      hint: "This is the most generous offering. Whatever you feel right now is okay." },
+    { text: "Finally, send this loving-kindness out to the whole world and every being in it. May the earth experience safety and harmony and balance. May all beings know peace.",
+      hint: "Picture the beautiful earth from a great distance. All of it held. All of it sacred." }
+];
 
-        function returnToHome() {
-            showScreen('home');
-            // In real app, would schedule check-in notification
-            setTimeout(() => {
-                if (confirm('Demo: Show check-in screen? (In real app, this would appear after 1 hour)')) {
-                    showScreen('checkin');
-                }
-            }, 3000);
-        }
+// ─── GRATITUDE ───
+const grat = [
+    { text: "Close your eyes. Take three deep breaths. You are in the clouds right now. It's hard to see. That's okay.",
+      hint: "Let the fog be what it is. You're about to rise above it." },
+    { text: "Thank you for this breath. Thank you for this body that carries me through everything, even the hard days.",
+      hint: "What do you notice in your body as you say this? Any warmth? Any softness?" },
+    { text: "Now think of something you're grateful for today. It can be small. Let it come to you.",
+      hint: "Don't force it. Whatever arrives first is right." },
+    { text: "Where did this good thing come from? What led to it being in your life? Trace the thread.",
+      hint: "Maybe it was a friend, a decision you made, a bit of luck. Follow it back." },
+    { text: "Think of someone who loves you. Thank you for being loved. Where did that love come from? What made it possible?",
+      hint: "Feel this in your chest. What does gratitude feel like in your body right now?" },
+    { text: "You're rising above the clouds now. Thank you for this moment, exactly as it is. Even the hard parts are teaching me something.",
+      hint: "The balloon is lifting. You can see further." },
+    { text: "From up here, you can see clearly. What really matters? What do you want to carry back down with you?",
+      hint: "Stay with whatever feeling is here. This is real. This is true." }
+];
 
-        function recordCheckIn(response) {
-            console.log('Check-in response:', response);
-            alert('Thank you for sharing. Your response has been recorded.');
-            showScreen('home');
-        }
+// ─── HAPPY MEMORY ───
+const mem = [
+    { text: "Close your eyes. Let your breath slow down. Let your shoulders drop.",
+      hint: "Take your time. There's no rush." },
+    { text: "Think of a time when you felt completely safe, loved, or joyful. Let yourself see it clearly.",
+      hint: "It might be recent or from long ago. Let the right one find you." },
+    { text: "Where were you? Look around in this memory. What do you see? What colors, what light?",
+      hint: "Try to be there. Not remembering it, but inside it." },
+    { text: "What do you hear? What do you smell? What does the air feel like on your skin?",
+      hint: "Let every sense come alive. The sounds, the scents, the temperature." },
+    { text: "What do you feel in your body right now? Where does the warmth or ease live? Your chest? Your hands? Your belly?",
+      hint: "Stay with that feeling. Let it spread." },
+    { text: "This feeling is real. This place inside you is real. It's always here, even when things are hard. You can return to it whenever you need to.",
+      hint: "Take one more breath here before you go." }
+];
 
-        // SCHEDULED PAUSES
-        function addSchedule() {
-            const time = document.getElementById('scheduleTime').value;
-            const label = document.getElementById('scheduleLabel').value.trim();
-            
-            if (!time) {
-                alert('Please select a time');
-                return;
-            }
-            
-            schedules.push({
-                time: time,
-                label: label || 'Scheduled Pause',
-                id: Date.now()
-            });
-            
-            document.getElementById('scheduleTime').value = '';
-            document.getElementById('scheduleLabel').value = '';
-            renderSchedules();
-        }
+let mI=0, gI=0, mRI=0;
 
-        function deleteSchedule(id) {
-            schedules = schedules.filter(s => s.id !== id);
-            renderSchedules();
-        }
+function go(id) {
+    document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    if(id==='schedules') renderScheds();
+}
 
-        function renderSchedules() {
-            const container = document.getElementById('scheduleList');
-            
-            if (schedules.length === 0) {
-                container.innerHTML = '<p style="text-align: center; color: #718096; padding: 32px;">No scheduled pauses yet. Add one below!</p>';
-                return;
-            }
-            
-            container.innerHTML = schedules.map(schedule => `
-                <div class="schedule-card">
-                    <div class="schedule-info">
-                        <div class="schedule-time">${schedule.time}</div>
-                        <div class="schedule-label">${schedule.label}</div>
-                    </div>
-                    <button class="delete-schedule" onclick="deleteSchedule(${schedule.id})">Delete</button>
-                </div>
-            `).join('');
-        }
+function saveIntention() {
+    const v = document.getElementById('intentionField').value.trim();
+    if(v) {
+        intention = v;
+        document.getElementById('showIntention').textContent = v;
+    }
+    go('home');
+}
 
-        // Load saved data on startup
-        window.addEventListener('load', () => {
-            const savedIntention = localStorage.getItem('sacredPauseIntention');
-            const savedSchedules = localStorage.getItem('sacredPauseSchedules');
-            
-            if (savedIntention) {
-                currentIntention = savedIntention;
-                document.getElementById('displayIntention').textContent = savedIntention;
-                document.getElementById('returnIntention').textContent = savedIntention;
-            }
-            
-            if (savedSchedules) {
-                schedules = JSON.parse(savedSchedules);
-            }
-        });
+function beginPractice(type) {
+    if(type==='metta') { mI=0; renderMetta(); go('mettaScreen'); }
+    else if(type==='gratitude') { gI=0; renderGrat(); go('gratScreen'); }
+    else if(type==='memory') { mRI=0; renderMem(); go('memScreen'); }
+}
 
-        // Save data when it changes
-        window.addEventListener('beforeunload', () => {
-            localStorage.setItem('sacredPauseIntention', currentIntention);
-            localStorage.setItem('sacredPauseSchedules', JSON.stringify(schedules));
-        });
-    </script>
+function pips(container, count, current) {
+    const el = document.getElementById(container);
+    el.innerHTML = '';
+    for(let i=0;i<count;i++) {
+        const d = document.createElement('div');
+        d.className = 'pip' + (i===current?' on':'');
+        el.appendChild(d);
+    }
+}
+
+// Metta
+function renderMetta() {
+    document.getElementById('mettaWords').textContent = metta[mI].text;
+    document.getElementById('mettaHint').textContent = metta[mI].hint;
+    pips('mettaPips', metta.length, mI);
+    document.getElementById('mettaBtn').textContent = mI < metta.length-1 ? 'Next' : 'Complete';
+}
+function nextMetta() { if(mI<metta.length-1){mI++;renderMetta();}else finish(); }
+
+// Gratitude
+function renderGrat() {
+    document.getElementById('gratWords').textContent = grat[gI].text;
+    document.getElementById('gratHint').textContent = grat[gI].hint;
+    pips('gratPips', grat.length, gI);
+    const b = document.getElementById('balloon');
+    if(gI >= 4) b.classList.add('fly'); else b.classList.remove('fly');
+}
+function nextGrat() { if(gI<grat.length-1){gI++;renderGrat();}else finish(); }
+
+// Memory
+function renderMem() {
+    document.getElementById('memWords').textContent = mem[mRI].text;
+    document.getElementById('memHint').textContent = mem[mRI].hint;
+    pips('memPips', mem.length, mRI);
+}
+function nextMem() { if(mRI<mem.length-1){mRI++;renderMem();}else finish(); }
+
+function finish() {
+    document.getElementById('retIntention').textContent = intention;
+    go('returnScreen');
+}
+
+function returnHome() {
+    go('home');
+    setTimeout(()=>{
+        if(confirm('Demo: Show check-in? (In real app this appears after ~1 hour)')) go('checkin');
+    }, 2500);
+}
+
+function checkin(r) { alert('Thank you. Your response has been recorded.'); go('home'); }
+
+// Schedules
+function addSched() {
+    const t=document.getElementById('schedTime').value;
+    const l=document.getElementById('schedLabel').value.trim();
+    if(!t){alert('Please select a time');return;}
+    scheds.push({time:t,label:l||'Scheduled Pause',id:Date.now()});
+    document.getElementById('schedTime').value='';
+    document.getElementById('schedLabel').value='';
+    renderScheds();
+}
+function delSched(id){scheds=scheds.filter(s=>s.id!==id);renderScheds();}
+function renderScheds() {
+    const c=document.getElementById('schedList');
+    if(!scheds.length){c.innerHTML='<p class="body-text" style="text-align:center;padding:24px;">No scheduled pauses yet.</p>';return;}
+    c.innerHTML=scheds.map(s=>`<div class="schedule-item"><div><div style="font-weight:600;font-size:16px;">${s.time}</div><div style="font-size:13px;color:var(--text-light);">${s.label}</div></div><button class="del-btn" onclick="delSched(${s.id})">Remove</button></div>`).join('');
+}
+</script>
 </body>
 </html>
