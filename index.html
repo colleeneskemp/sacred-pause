@@ -514,7 +514,7 @@
                 <label>Your intention</label>
                 <p id="showIntention">Be present and kind</p>
             </div>
-            <button class="pause-btn" onclick="go('selectPractice')">Pause</button>
+            <button class="pause-btn" onclick="startPause()">Pause</button>
             <button class="btn btn-soft" onclick="go('schedules')">Schedule pauses</button>
             <button class="btn btn-soft" onclick="go('setIntention')">Update intention</button>
         </div>
@@ -562,10 +562,10 @@
     <!-- INTENSITY BEFORE -->
     <div class="screen" id="intensityBefore">
         <div class="content" style="text-align:center;">
-            <button class="back-link" style="align-self:flex-start;" onclick="go('selectPractice')">← Different practice</button>
+            <button class="back-link" style="align-self:flex-start;" onclick="go('home')">← Back</button>
             <div style="flex:1;display:flex;flex-direction:column;justify-content:center;">
-                <h2 id="intBeforeTitle">Loving-kindness</h2>
-                <p class="body-text" style="margin:12px 24px 32px;">How strong is what you're feeling right now? <em style="color:var(--ocean-mid);">Optional — move the slider, or just begin.</em></p>
+                <h2>Before we begin</h2>
+                <p class="body-text" style="margin:12px 24px 32px;">How strong is what you're feeling right now? <em style="color:var(--ocean-mid);">Optional — move the slider, or just continue.</em></p>
                 <div class="intensity-display" id="intBeforeValue">—</div>
                 <input type="range" min="1" max="10" value="5" id="intBeforeSlider" class="intensity-slider" oninput="onBeforeSlider()">
                 <div class="intensity-scale">
@@ -808,11 +808,9 @@ function saveIntention() {
     go('home');
 }
 
-function beginPractice(type) {
-    currentSession = { practice: type, intention, beforeAt: Date.now(), before: null, after: null };
+function startPause() {
+    currentSession = { practice: null, intention, beforeAt: Date.now(), before: null, after: null };
     intBeforeTouched = false;
-    const titles = { metta: 'Loving-kindness', gratitude: 'Gratitude lifting', memory: 'Happy memory' };
-    document.getElementById('intBeforeTitle').textContent = titles[type] || 'Before we begin';
     document.getElementById('intBeforeSlider').value = 5;
     document.getElementById('intBeforeValue').textContent = '—';
     go('intensityBefore');
@@ -827,7 +825,15 @@ function beginAfterIntensity() {
     if(intBeforeTouched && currentSession) {
         currentSession.before = Number(document.getElementById('intBeforeSlider').value);
     }
-    const type = currentSession ? currentSession.practice : 'metta';
+    go('selectPractice');
+}
+
+function beginPractice(type) {
+    if(!currentSession) {
+        currentSession = { practice: type, intention, beforeAt: Date.now(), before: null, after: null };
+    } else {
+        currentSession.practice = type;
+    }
     if(type==='metta') { mI=0; renderMetta(); go('mettaScreen'); }
     else if(type==='gratitude') { gI=0; renderGrat(); go('gratScreen'); }
     else if(type==='memory') { mRI=0; renderMem(); go('memScreen'); }
