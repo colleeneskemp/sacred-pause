@@ -514,6 +514,31 @@
         <div style="padding:16px 28px 28px;">
             <button class="btn btn-main" id="mettaBtn" onclick="nextMetta()">Next</button>
             <button class="btn btn-soft" onclick="finish()">I'm ready to return</button>
+            <div style="text-align:center;margin-top:10px;">
+                <button class="back-link" onclick="openMettaPhrases()">Customize the words</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- METTA: CUSTOMIZE PHRASES -->
+    <div class="screen" id="mettaPhrasesScreen">
+        <div class="content">
+            <button class="back-link" onclick="go('mettaScreen')">← Back to practice</button>
+            <div class="spacer"></div>
+            <h2>Your blessing</h2>
+            <p class="body-text" style="margin-bottom:20px;">These are the words you'll offer — to yourself, to those you love, to all beings. Make them yours.</p>
+
+            <label style="font-size:13px;color:var(--text-light);font-style:italic;display:block;margin-bottom:4px;">May I…</label>
+            <input type="text" id="phrase1" placeholder="be safe">
+
+            <label style="font-size:13px;color:var(--text-light);font-style:italic;display:block;margin-bottom:4px;">May I…</label>
+            <input type="text" id="phrase2" placeholder="be held with care">
+
+            <label style="font-size:13px;color:var(--text-light);font-style:italic;display:block;margin-bottom:4px;">May I…</label>
+            <input type="text" id="phrase3" placeholder="be at ease">
+
+            <button class="btn btn-main" onclick="savePhrases()">Save</button>
+            <button class="btn btn-soft" onclick="resetPhrases()">Restore the original words</button>
         </div>
     </div>
 
@@ -594,25 +619,42 @@ let intention = 'Be present and kind';
 let scheds = [];
 
 // ─── METTA (Loving-Kindness) ───
+const DEFAULT_METTA_PHRASES = ['be safe', 'be held with care', 'be at ease'];
+let mettaPhrases = loadMettaPhrases();
+
+function loadMettaPhrases() {
+    try {
+        const saved = JSON.parse(localStorage.getItem('mettaPhrases'));
+        if (Array.isArray(saved) && saved.length === 3 && saved.every(s => typeof s === 'string' && s.trim())) {
+            return saved.map(s => s.trim());
+        }
+    } catch (e) {}
+    return [...DEFAULT_METTA_PHRASES];
+}
+
+function blessing(subject) {
+    return mettaPhrases.map(p => `May ${subject} ${p}.`).join(' ');
+}
+
 const metta = [
-    { text: "Place your hand on your heart. Feel the weight and warmth of it. Take a slow, deep breath.",
-      hint: "Let yourself arrive." },
-    { text: "May I be safe. May I be held with care. May I experience happiness, and the root of happiness. May I know I am enough.",
-      hint: "Breathe these words in like they're meant for you, because they are." },
-    { text: "Now picture someone you love deeply. See their face. May you be safe. May you be held with care. May you experience happiness, and the root of happiness.",
-      hint: "Let their face come to you. A partner, a child, a dear friend. See them clearly." },
-    { text: "Picture your closest people. Your family. Your dearest friends. See each of their faces. May you all be safe. May you all be held with care.",
-      hint: "Let them gather in your mind. Each beloved face." },
-    { text: "Now think of the people in your wider circle. Colleagues. Neighbors. Familiar faces. May you be safe. May you know peace. May you be held with care.",
-      hint: "Picture the people you see regularly but don't know deeply." },
-    { text: "Think of strangers. The person in the car driving past. The cashier at the store. People you'll never meet. May you be safe. May you be free from suffering.",
-      hint: "Imagine the faces you passed today without noticing." },
-    { text: "Now, gently, bring to mind someone in your life who you're having trouble with. Take a breath. May you be safe. May you be held with care. May we both find our way through this.",
-      hint: "This is hard. Be gentle with yourself. You don't have to force anything." },
-    { text: "Now think of people in the world who you struggle with. People whose actions you don't understand. Take a breath. May you too be safe. May you find your way to peace.",
-      hint: "This is the most generous offering. Whatever you feel right now is okay." },
-    { text: "Finally, send this loving-kindness out to the whole world and every being in it. May the earth experience safety and harmony and balance. May all beings know peace.",
-      hint: "Picture the beautiful earth from a great distance. All of it held. All of it sacred." }
+    { text: () => "Place a hand on your heart. Feel the weight of it. Notice the warmth where your palm meets your chest. Take three slow breaths.",
+      hint: "Let yourself arrive in your body. There's no rush." },
+    { text: () => blessing('I'),
+      hint: "Speak the words slowly, like you mean them. Notice if anything softens — your jaw, your shoulders, your chest." },
+    { text: () => `Picture someone you love. See their face clearly. ${blessing('you')}`,
+      hint: "A partner, a child, a dear friend. Let their face come to you." },
+    { text: () => `Picture your closest people — family, dearest friends. See each face. ${blessing('you')}`,
+      hint: "Let them gather. Each beloved face." },
+    { text: () => `Think of people in your wider circle. Colleagues. Neighbors. Familiar faces. ${blessing('you')}`,
+      hint: "Notice where in your body you feel this offering — your chest, your throat, your hands." },
+    { text: () => `Think of strangers — the person in the car next to yours, the cashier at the store, people you'll never meet. ${blessing('you')}`,
+      hint: "Picture faces you passed today without noticing." },
+    { text: () => `Bring to mind someone in your life you're having trouble with. Take a breath. ${blessing('you')} May we both find our way through this.`,
+      hint: "This is hard. Notice what shows up in your body — tightness, heat, a held breath. Whatever's there is okay." },
+    { text: () => `Think of people in the world whose actions you don't understand. Take a breath. ${blessing('you')} May you find your way to peace.`,
+      hint: "Whatever you feel right now is okay." },
+    { text: () => `Send this care out to the whole world. May the earth know safety and balance. ${blessing('all beings')}`,
+      hint: "Picture the earth from far away. All of it held. All of it sacred." }
 ];
 
 // ─── GRATITUDE ───
@@ -684,12 +726,37 @@ function pips(container, count, current) {
 
 // Metta
 function renderMetta() {
-    document.getElementById('mettaWords').textContent = metta[mI].text;
+    document.getElementById('mettaWords').textContent = metta[mI].text();
     document.getElementById('mettaHint').textContent = metta[mI].hint;
     pips('mettaPips', metta.length, mI);
     document.getElementById('mettaBtn').textContent = mI < metta.length-1 ? 'Next' : 'Complete';
 }
 function nextMetta() { if(mI<metta.length-1){mI++;renderMetta();}else finish(); }
+
+function openMettaPhrases() {
+    document.getElementById('phrase1').value = mettaPhrases[0];
+    document.getElementById('phrase2').value = mettaPhrases[1];
+    document.getElementById('phrase3').value = mettaPhrases[2];
+    go('mettaPhrasesScreen');
+}
+function savePhrases() {
+    const next = [
+        document.getElementById('phrase1').value.trim() || DEFAULT_METTA_PHRASES[0],
+        document.getElementById('phrase2').value.trim() || DEFAULT_METTA_PHRASES[1],
+        document.getElementById('phrase3').value.trim() || DEFAULT_METTA_PHRASES[2],
+    ];
+    mettaPhrases = next;
+    try { localStorage.setItem('mettaPhrases', JSON.stringify(next)); } catch(e) {}
+    renderMetta();
+    go('mettaScreen');
+}
+function resetPhrases() {
+    mettaPhrases = [...DEFAULT_METTA_PHRASES];
+    try { localStorage.removeItem('mettaPhrases'); } catch(e) {}
+    document.getElementById('phrase1').value = mettaPhrases[0];
+    document.getElementById('phrase2').value = mettaPhrases[1];
+    document.getElementById('phrase3').value = mettaPhrases[2];
+}
 
 // Gratitude
 function renderGrat() {
