@@ -384,6 +384,63 @@
         }
 
         .spacer { height: 12px; }
+
+        /* Intensity slider */
+        .intensity-slider {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            background: linear-gradient(90deg, var(--ocean-pale) 0%, var(--rose-light) 60%, var(--rose) 100%);
+            outline: none;
+            margin: 8px 0 4px;
+        }
+        .intensity-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 28px; height: 28px;
+            border-radius: 50%;
+            background: var(--ocean-deep);
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(44,74,82,0.3);
+            transition: transform 0.2s;
+        }
+        .intensity-slider::-webkit-slider-thumb:hover { transform: scale(1.1); }
+        .intensity-slider::-moz-range-thumb {
+            width: 28px; height: 28px;
+            border-radius: 50%;
+            background: var(--ocean-deep);
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(44,74,82,0.3);
+        }
+        .intensity-display {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 56px;
+            color: var(--ocean-deep);
+            text-align: center;
+            margin: 8px 0 4px;
+            font-weight: 300;
+            line-height: 1;
+        }
+        .intensity-scale {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            color: var(--text-light);
+            margin: 4px 4px 16px;
+            letter-spacing: 0.04em;
+        }
+        .intensity-delta {
+            font-family: 'Cormorant Garamond', serif;
+            font-style: italic;
+            font-size: 18px;
+            color: var(--ocean-mid);
+            text-align: center;
+            margin: 8px 0;
+            min-height: 24px;
+        }
     </style>
 </head>
 <body>
@@ -502,6 +559,24 @@
         </div>
     </div>
 
+    <!-- INTENSITY BEFORE -->
+    <div class="screen" id="intensityBefore">
+        <div class="content" style="text-align:center;">
+            <button class="back-link" style="align-self:flex-start;" onclick="go('selectPractice')">← Different practice</button>
+            <div style="flex:1;display:flex;flex-direction:column;justify-content:center;">
+                <h2 id="intBeforeTitle">Loving-kindness</h2>
+                <p class="body-text" style="margin:12px 24px 32px;">How strong is what you're feeling right now? <em style="color:var(--ocean-mid);">Optional — move the slider, or just begin.</em></p>
+                <div class="intensity-display" id="intBeforeValue">—</div>
+                <input type="range" min="1" max="10" value="5" id="intBeforeSlider" class="intensity-slider" oninput="onBeforeSlider()">
+                <div class="intensity-scale">
+                    <span>barely there</span>
+                    <span>overwhelming</span>
+                </div>
+            </div>
+            <button class="btn btn-main" onclick="beginAfterIntensity()">Begin</button>
+        </div>
+    </div>
+
     <!-- METTA PRACTICE -->
     <div class="screen" id="mettaScreen">
         <div class="stage stage-metta">
@@ -584,11 +659,23 @@
     <!-- RETURN -->
     <div class="screen" id="returnScreen">
         <div class="return-stage">
-            <div class="practice-icon" style="margin-bottom:28px;">🌿</div>
-            <h1 style="margin-bottom:16px;">You're ready</h1>
-            <p class="body-text" style="margin-bottom:8px;">Take one more deep breath.</p>
-            <p class="body-text" style="margin-bottom:24px;">Remember your intention:</p>
-            <p class="serif" id="retIntention" style="font-size:24px;color:var(--ocean-deep);font-weight:500;"></p>
+            <div class="practice-icon" style="margin-bottom:24px;">🌿</div>
+            <h1 style="margin-bottom:14px;">You're ready</h1>
+            <p class="body-text" style="margin-bottom:20px;">Take one more deep breath.</p>
+
+            <div style="width:100%;max-width:300px;margin:0 auto 24px;">
+                <p class="body-text" style="margin-bottom:4px;font-size:13px;">How does it feel now? <em>Optional.</em></p>
+                <div class="intensity-display" id="intAfterValue" style="font-size:42px;">—</div>
+                <input type="range" min="1" max="10" value="5" id="intAfterSlider" class="intensity-slider" oninput="onAfterSlider()">
+                <div class="intensity-scale">
+                    <span>barely there</span>
+                    <span>overwhelming</span>
+                </div>
+                <div class="intensity-delta" id="intAfterDelta"></div>
+            </div>
+
+            <p class="body-text" style="margin-bottom:8px;">Remember your intention:</p>
+            <p class="serif" id="retIntention" style="font-size:22px;color:var(--ocean-deep);font-weight:500;"></p>
         </div>
         <div style="padding:16px 28px 32px;">
             <button class="btn btn-main" onclick="returnHome()">Return to the moment</button>
@@ -615,8 +702,12 @@
 </div>
 
 <script>
-let intention = 'Be present and kind';
+let intention = (() => { try { return localStorage.getItem('intention') || 'Be present and kind'; } catch(e) { return 'Be present and kind'; }})();
 let scheds = [];
+let sessions = (() => { try { return JSON.parse(localStorage.getItem('sessions') || '[]'); } catch(e) { return []; }})();
+let currentSession = null;
+let intBeforeTouched = false;
+let intAfterTouched = false;
 
 // ─── METTA (Loving-Kindness) ───
 const DEFAULT_METTA_PHRASES = ['be safe', 'be held with care', 'be at ease'];
@@ -659,19 +750,21 @@ const metta = [
 
 // ─── GRATITUDE ───
 const grat = [
-    { text: "Close your eyes. Take three deep breaths. You are in the clouds right now. It's hard to see. That's okay.",
+    { text: "Close your eyes. Take three deep breaths. You're in the clouds right now. It's hard to see. That's okay.",
       hint: "Let the fog be what it is. You're about to rise above it." },
-    { text: "Thank you for this breath. Thank you for this body that carries me through everything, even the hard days.",
-      hint: "What do you notice in your body as you say this? Any warmth? Any softness?" },
-    { text: "Now think of something you're grateful for today. It can be small. Let it come to you.",
+    { text: "Thank you for this breath. Thank you for this body that's carrying you through everything, even the hard days.",
+      hint: "Notice your chest rising and falling. Where do you feel the breath in your body?" },
+    { text: "Now think of something specific from today you're grateful for. It can be small. Let it come to you.",
       hint: "Don't force it. Whatever arrives first is right." },
-    { text: "Where did this good thing come from? What led to it being in your life? Trace the thread.",
-      hint: "Maybe it was a friend, a decision you made, a bit of luck. Follow it back." },
-    { text: "Think of someone who loves you. Thank you for being loved. Thank you for having the capacity to love and to be loved.",
-      hint: "Feel this in your chest. What does gratitude feel like in your body right now?" },
-    { text: "You're rising above the clouds now. Thank you for this moment, exactly as it is. Even the hard parts are teaching me something.",
-      hint: "The balloon is lifting. You can see further." },
-    { text: "From up here, you can see clearly. What really matters? What do you want to carry back down with you?",
+    { text: "Stay with it for a moment. Where does this gratitude land in your body? Warmth in the chest? Softness in the face?",
+      hint: "Let it land before you move on. This is the practice." },
+    { text: "Now trace it back. What had to happen for this good thing to reach you? Who or what helped, even in small ways?",
+      hint: "Maybe a friend, a decision, a stranger, a bit of luck. Follow the thread back as far as it goes." },
+    { text: "Think of someone who loves you. Thank you for being loved. Thank you for the capacity to love and be loved.",
+      hint: "Let this settle in your chest." },
+    { text: "What feeling is this gratitude touching? What need underneath it feels met right now — connection, ease, beauty, being seen?",
+      hint: "Name the feeling. Name the need. Let the thank-you have somewhere to land." },
+    { text: "You're rising above the clouds. From up here, you can see clearly. What do you want to carry back down with you?",
       hint: "Stay with whatever feeling is here. This is real. This is true." }
 ];
 
@@ -681,13 +774,19 @@ const mem = [
       hint: "Take your time. There's no rush." },
     { text: "Think of a time when you felt completely safe, loved, or joyful. Let yourself see it clearly.",
       hint: "It might be recent or from long ago. Let the right one find you." },
-    { text: "Where were you? Look around in this memory. What do you see? What colors, what light?",
+    { text: "Look around. What do you see? Colors, light, the shape of the place.",
       hint: "Try to be there. Not remembering it, but inside it." },
-    { text: "What do you hear? What do you smell? What does the air feel like on your skin?",
-      hint: "Let every sense come alive. The sounds, the scents, the temperature." },
-    { text: "What do you feel in your body right now? Where does the warmth or ease live? Your chest? Your hands? Your belly?",
-      hint: "Let that feeling spread throughout your body. Stay there in that moment. Hold your attention on those sensations." },
-    { text: "This feeling is real. This place inside you is real. It's always here, even when things are hard. You can return to it whenever you need to.",
+    { text: "What can you hear? Voices, music, wind, silence — let the sounds come back.",
+      hint: "Listen as if you're there now." },
+    { text: "What's in the air? A scent that places you there — food, weather, a particular smell from that moment.",
+      hint: "Smell brings memory close. Let it." },
+    { text: "What does the air feel like on your skin? Warm, cool, a breeze, sunlight, the texture of fabric or grass?",
+      hint: "Notice the temperature. Notice what touches you." },
+    { text: "Now your body, here. Where does the warmth or ease of this memory live? Chest, hands, belly?",
+      hint: "Let that feeling spread. This is the same body that was there." },
+    { text: "Stay. Take a few more slow breaths here. Don't go anywhere yet.",
+      hint: "Let the moment fill you. There's nothing to do but be here." },
+    { text: "This place inside you is real. It's always here, even when things are hard. You can return whenever you need to.",
       hint: "Take one more breath here before you go." }
 ];
 
@@ -704,14 +803,49 @@ function saveIntention() {
     if(v) {
         intention = v;
         document.getElementById('showIntention').textContent = v;
+        try { localStorage.setItem('intention', v); } catch(e) {}
     }
     go('home');
 }
 
 function beginPractice(type) {
+    currentSession = { practice: type, intention, beforeAt: Date.now(), before: null, after: null };
+    intBeforeTouched = false;
+    const titles = { metta: 'Loving-kindness', gratitude: 'Gratitude lifting', memory: 'Happy memory' };
+    document.getElementById('intBeforeTitle').textContent = titles[type] || 'Before we begin';
+    document.getElementById('intBeforeSlider').value = 5;
+    document.getElementById('intBeforeValue').textContent = '—';
+    go('intensityBefore');
+}
+
+function onBeforeSlider() {
+    intBeforeTouched = true;
+    document.getElementById('intBeforeValue').textContent = document.getElementById('intBeforeSlider').value;
+}
+
+function beginAfterIntensity() {
+    if(intBeforeTouched && currentSession) {
+        currentSession.before = Number(document.getElementById('intBeforeSlider').value);
+    }
+    const type = currentSession ? currentSession.practice : 'metta';
     if(type==='metta') { mI=0; renderMetta(); go('mettaScreen'); }
     else if(type==='gratitude') { gI=0; renderGrat(); go('gratScreen'); }
     else if(type==='memory') { mRI=0; renderMem(); go('memScreen'); }
+}
+
+function onAfterSlider() {
+    intAfterTouched = true;
+    const v = Number(document.getElementById('intAfterSlider').value);
+    document.getElementById('intAfterValue').textContent = v;
+    const deltaEl = document.getElementById('intAfterDelta');
+    if(currentSession && currentSession.before !== null) {
+        const delta = currentSession.before - v;
+        if(delta > 0) deltaEl.textContent = `${currentSession.before} → ${v}. That's something.`;
+        else if(delta === 0) deltaEl.textContent = `Held steady. That counts.`;
+        else deltaEl.textContent = `${currentSession.before} → ${v}. Still here. That's okay.`;
+    } else {
+        deltaEl.textContent = '';
+    }
 }
 
 function pips(container, count, current) {
@@ -764,7 +898,7 @@ function renderGrat() {
     document.getElementById('gratHint').textContent = grat[gI].hint;
     pips('gratPips', grat.length, gI);
     const b = document.getElementById('balloon');
-    if(gI >= 4) b.classList.add('fly'); else b.classList.remove('fly');
+    if(gI >= 5) b.classList.add('fly'); else b.classList.remove('fly');
 }
 function nextGrat() { if(gI<grat.length-1){gI++;renderGrat();}else finish(); }
 
@@ -778,10 +912,25 @@ function nextMem() { if(mRI<mem.length-1){mRI++;renderMem();}else finish(); }
 
 function finish() {
     document.getElementById('retIntention').textContent = intention;
+    intAfterTouched = false;
+    document.getElementById('intAfterSlider').value = 5;
+    document.getElementById('intAfterValue').textContent = '—';
+    document.getElementById('intAfterDelta').textContent = '';
     go('returnScreen');
 }
 
 function returnHome() {
+    if(currentSession) {
+        if(intAfterTouched) {
+            currentSession.after = Number(document.getElementById('intAfterSlider').value);
+            currentSession.afterAt = Date.now();
+        }
+        if(currentSession.before !== null || currentSession.after !== null) {
+            sessions.push(currentSession);
+            try { localStorage.setItem('sessions', JSON.stringify(sessions)); } catch(e) {}
+        }
+        currentSession = null;
+    }
     go('home');
     setTimeout(()=>{
         if(confirm('Demo: Show check-in? (In real app this appears after ~1 hour)')) go('checkin');
@@ -806,6 +955,12 @@ function renderScheds() {
     if(!scheds.length){c.innerHTML='<p class="body-text" style="text-align:center;padding:24px;">No scheduled pauses yet.</p>';return;}
     c.innerHTML=scheds.map(s=>`<div class="schedule-item"><div><div style="font-weight:600;font-size:16px;">${s.time}</div><div style="font-size:13px;color:var(--text-light);">${s.label}</div></div><button class="del-btn" onclick="delSched(${s.id})">Remove</button></div>`).join('');
 }
+
+// Restore saved intention; skip welcome on return visits.
+document.getElementById('showIntention').textContent = intention;
+try {
+    if(localStorage.getItem('intention')) go('home');
+} catch(e) {}
 </script>
 </body>
 </html>
